@@ -4,7 +4,7 @@ import { Wifi, Bed, LocalDining } from '@mui/icons-material';
 
 const Home = () => {
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: 4 , backgroundColor: '#f5f5f5'}}>
       {/* Section d'accueil */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h2" component="h1" gutterBottom>
@@ -13,7 +13,7 @@ const Home = () => {
         <Typography variant="h6" color="textSecondary" paragraph>
           Profitez d'un séjour inoubliable dans nos chambres luxueuses et notre ambiance chaleureuse.
         </Typography>
-        <Button variant="contained" color="primary" size="large" href="/rooms" sx={{ mr: 2 }}>
+        <Button variant="contained" color="primary" size="large" href="/chambres" sx={{ mr: 2 }}>
           Explorez nos chambres
         </Button>
         <Button variant="outlined" color="primary" size="large" href="/contact">
