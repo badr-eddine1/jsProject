@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Typography, Container, Grid, Paper, Card, CardMedia, CardContent, Button } from '@mui/material';
-
+import { Link } from 'react-scroll';
 
 const About = () => {
   return (
-    <Box sx={{ p: 4, backgroundColor: '#f5f5f5' }}>
+    <Box id="a propos"  sx={{ p: 4, backgroundColor: '#f5f5f5' }}>
       <Container>
         <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
           À propos de notre hôtel
@@ -30,7 +30,16 @@ const About = () => {
                 <Typography variant="body1" color="textSecondary" paragraph>
                   Nos chambres spacieuses offrent une vue imprenable sur la ville. Profitez de l'élégance et du confort de chaque détail, conçu pour rendre votre séjour agréable.
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth>
+                <Button 
+                variant="contained" 
+                color="primary"
+                 fullWidth
+                  component={Link}
+                  to={'homeroom'}  // Utilisation du même nom pour l'ancre
+                  smooth={true}
+                  duration={1000}
+                 
+                 >
                   Découvrez nos chambres
                 </Button>
               </CardContent>
@@ -53,7 +62,15 @@ const About = () => {
                 <Typography variant="body1" color="textSecondary" paragraph>
                   Nous proposons une gamme complète de services pour votre confort, y compris un spa, un restaurant gastronomique, une piscine et une salle de sport.
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth>
+                <Button 
+                variant="contained"
+                 color="primary"
+                  fullWidth
+                  component={Link}
+                  to={'services'}  // Utilisation du même nom pour l'ancre
+                  smooth={true}
+                  duration={1000}
+                  >
                   Explorez nos services
                 </Button>
               </CardContent>
@@ -62,7 +79,7 @@ const About = () => {
         </Grid>
 
         {/* Section additionnelle : Pourquoi choisir notre hôtel ? */}
-        <Box sx={{ mt: 6, textAlign: 'center' }}>
+        <Box id="services" sx={{ mt: 6, textAlign: 'center' }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
             Pourquoi choisir notre hôtel ?
           </Typography>

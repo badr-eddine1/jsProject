@@ -1,10 +1,12 @@
 import React from 'react';
 import { Box, Button, Typography, Grid, Card, CardContent } from '@mui/material';
 import { Wifi, Bed, LocalDining } from '@mui/icons-material';
+import { Link } from 'react-scroll';
 
 const Home = () => {
   return (
-    <Box sx={{ p: 4 , backgroundColor: '#f5f5f5'}}>
+    <Box id="accueil" sx={{ p: 4 , backgroundColor: '#f5f5f5'}}>
+      
       {/* Section d'accueil */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h2" component="h1" gutterBottom>
@@ -13,10 +15,29 @@ const Home = () => {
         <Typography variant="h6" color="textSecondary" paragraph>
           Profitez d'un séjour inoubliable dans nos chambres luxueuses et notre ambiance chaleureuse.
         </Typography>
-        <Button variant="contained" color="primary" size="large" href="/chambres" sx={{ mr: 2 }}>
+        <Button 
+        variant="contained" 
+        color="primary" 
+        size="large" 
+        sx={{ mr: 2 }}
+         component={Link}
+        to={'homeroom'}  // Utilisation du même nom pour l'ancre
+              smooth={true}
+              duration={1000} 
+        >
           Explorez nos chambres
         </Button>
-        <Button variant="outlined" color="primary" size="large" href="/contact">
+        <Button 
+        variant="outlined" 
+         color="primary" 
+          size="large" 
+          component={Link}
+          to={'contact'}  // Utilisation du même nom pour l'ancre
+          smooth={true}
+          duration={1000}
+        
+        
+        >
           Contactez-nous
         </Button>
       </Box>

@@ -1,0 +1,11 @@
+.centered-div {
+    width: 300px;
+    height: 200px;
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px;
+  }

@@ -8,8 +8,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-router-dom';
-
+import { Link } from 'react-scroll';
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -21,11 +20,11 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
-  const navItems = ['Accueil', 'Chambres', 'À propos', 'Contact'];
+  const navItems = ['Accueil', 'Chambres', 'A propos', 'Contact'];
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>                                                                                  
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 0.5 }}>
             HotelBooking
@@ -35,10 +34,12 @@ const Navbar = () => {
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             {navItems.map((item) => (
               <Button
-                key={item}
-                sx={{ color: '#fff', textTransform: 'none', marginRight: 2 }}
-                component={Link}
-                to={`/${item.toLowerCase()}`} // Lien dynamique vers chaque page
+              key={item}
+              sx={{ color: '#fff', textTransform: 'none', marginRight: 2 }}
+              component={Link}
+              to={item.toLowerCase()} 
+              smooth={true}
+              duration={1000}  
               >
                 {item}
               </Button>

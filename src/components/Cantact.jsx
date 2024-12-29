@@ -1,95 +1,70 @@
-import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Grid, Paper } from '@mui/material';
+import React from 'react';
+import { Box, Typography, Grid, IconButton } from '@mui/material';
+import { Phone, Email, LocationOn, Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
 
-const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Logic for submitting form data (e.g., API call)
-    alert('Form submitted!');
-  };
-
+const FooterContact = () => {
   return (
-    <Box sx={{ p: 4, backgroundColor: '#f4f4f4' }}>
-      <Typography variant="h3" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-        Contactez-nous
-      </Typography>
+    <Box
+      id="contact" // Ajoutez un id pour la navigation
+      sx={{
+        backgroundColor: '#212121',
+        color: 'white',
+        p: 4,
+        position: 'relative',
+        bottom: 0,
+        width: '100%',
+      }}
+    >
+      <Grid container spacing={4} justifyContent="center">
+        {/* Informations de contact */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Typography variant="h6" gutterBottom>
+            Informations de contact
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Phone color="primary" sx={{ mr: 2 }} />
+            <Typography>+212 6 12 34 56 78</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Email color="primary" sx={{ mr: 2 }} />
+            <Typography>contact@hotel-exemple.com</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <LocationOn color="primary" sx={{ mr: 2 }} />
+            <Typography>123, Avenue Hassan II, Casablanca, Maroc</Typography>
+          </Box>
+        </Grid>
 
-      <Paper sx={{ p: 4, borderRadius: 2, boxShadow: 3 }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={4}>
-            {/* Nom */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Nom"
-                variant="outlined"
-                fullWidth
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Email */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Email"
-                variant="outlined"
-                fullWidth
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Message */}
-            <Grid item xs={12}>
-              <TextField
-                label="Message"
-                variant="outlined"
-                fullWidth
-                multiline
-                rows={6}
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {/* Submit Button */}
-            <Grid item xs={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ mt: 2, padding: '10px' }}
-              >
-                Envoyer
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
+        {/* Réseaux sociaux */}
+        <Grid item xs={12} sm={6} md={3}>
+          <Typography variant="h6" gutterBottom>
+            Suivez-nous
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <IconButton color="primary" href="https://facebook.com" target="_blank">
+              <Facebook />
+            </IconButton>
+            <IconButton color="primary" href="https://twitter.com" target="_blank">
+              <Twitter />
+            </IconButton>
+            <IconButton color="primary" href="https://instagram.com" target="_blank">
+              <Instagram />
+            </IconButton>
+            <IconButton color="primary" href="https://linkedin.com" target="_blank">
+              <LinkedIn />
+            </IconButton>
+          </Box>
+        </Grid>
+      </Grid>
+      
+      {/* Copyright */}
+      <Box sx={{ textAlign: 'center', mt: 3 }}>
+        <Typography variant="body2">
+          © 2024 Hotel Example - Tous droits réservés
+        </Typography>
+      </Box>
     </Box>
   );
 };
 
-export default Contact;
+export default FooterContact;

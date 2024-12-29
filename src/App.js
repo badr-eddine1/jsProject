@@ -4,8 +4,9 @@ import Navbar from './components/navbar';
 import Home from './components/Home'; // Page d'accueil
 import Room from './components/Room'; // Page des chambres
 import About from './components/About';
-import Contact from './components/Cantact';
-
+import Reserver from './components/Reserver';
+import Cantact from './components/Cantact';
+import HomeRoom from './components/HomeRoom';
 const App = () => {
   return (
     <Router>
@@ -18,20 +19,21 @@ const App = () => {
     {/* Affichage de la page d'accueil */}
     <Home />
 
-    {/* Espacement entre les deux sections */}
-    <div style={{ marginTop: '40px' }} />
+    <HomeRoom/>
 
-    {/* Affichage de la page À propos */}
+   
     <About />
+    <Cantact />
   </div>
 } />
       <Route path="/À propos" element={<About />} />
         <Route path="/Accueil" element={<Home />} />
         <Route path="/chambres" element={<Room />} />
-        <Route path="/Contact" element={<Contact />} />
-    
+        <Route path="/reservation" element={<Reserver />} />
       </Routes>
+      
     </Router>
+    
   );
 };
 
