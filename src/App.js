@@ -7,6 +7,7 @@ import About from './components/About';
 import Reserver from './components/Reserver';
 import Cantact from './components/Cantact';
 import HomeRoom from './components/HomeRoom';
+import LoginForm from './components/ui/LoginForm'
 const App = () => {
   return (
     <Router>
@@ -30,6 +31,8 @@ const App = () => {
         <Route path="/Accueil" element={<Home />} />
         <Route path="/chambres" element={<Room />} />
         <Route path="/reservation" element={<Reserver />} />
+        <Route path="/LoginForm" element={<LoginForm />} />
+
       </Routes>
       
     </Router>
