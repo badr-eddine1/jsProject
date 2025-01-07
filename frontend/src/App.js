@@ -8,16 +8,18 @@ import Reserver from './components/Reserver';
 import Cantact from './components/Cantact';
 import HomeRoom from './components/HomeRoom';
 import LoginForm from './components/ui/LoginForm'
+import SignupForm from './components/ui/SignupForm'
 const App = () => {
   return (
     <Router>
-      <Navbar />
+      
    
   
       <Routes>
       <Route path="/" element={
   <div>
     {/* Affichage de la page d'accueil */}
+    <Navbar />
     <Home />
 
     <HomeRoom/>
@@ -29,10 +31,14 @@ const App = () => {
 } />
       <Route path="/À propos" element={<About />} />
         <Route path="/Accueil" element={<Home />} />
-        <Route path="/chambres" element={<Room />} />
+        <Route path="/chambres" element={   <div>
+          <Navbar />
+          <Room />
+        </div> 
+                        } />
         <Route path="/reservation" element={<Reserver />} />
         <Route path="/LoginForm" element={<LoginForm />} />
-
+        <Route path="/SignupForm" element={<SignupForm />} />
       </Routes>
       
     </Router>

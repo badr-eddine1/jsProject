@@ -27,15 +27,15 @@ const FooterContact = () => {
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <Email color="primary" sx={{ mr: 2 }} />
-            <Typography>contact@hotel-exemple.com</Typography>
+            <Typography>contact@gmail.com</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <LocationOn color="primary" sx={{ mr: 2 }} />
-            <Typography>123, Avenue Hassan II, Casablanca, Maroc</Typography>
+            <Typography>123, Mhamid, Marrakech, Maroc</Typography>
           </Box>
         </Grid>
 
-        {/* Réseaux sociaux */}
+  
         <Grid item xs={12} sm={6} md={3}>
           <Typography variant="h6" gutterBottom>
             Suivez-nous
@@ -57,10 +57,10 @@ const FooterContact = () => {
         </Grid>
       </Grid>
       
-      {/* Copyright */}
+    
       <Box sx={{ textAlign: 'center', mt: 3 }}>
         <Typography variant="body2">
-          © 2024 Hotel Example - Tous droits réservés
+         
         </Typography>
       </Box>
     </Box>

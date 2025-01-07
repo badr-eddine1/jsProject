@@ -8,7 +8,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-scroll';
+import { Link } from 'react-scroll'; // Pour le scroll
+import { Link as RouterLink } from 'react-router-dom'; // Pour la navigation React Router
+
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -24,22 +26,22 @@ const Navbar = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>                                                                                  
+      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 0.5 }}>
-            HotelBooking
+            BMBI
           </Typography>
 
           {/* Desktop Navbar */}
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             {navItems.map((item) => (
               <Button
-              key={item}
-              sx={{ color: '#fff', textTransform: 'none', marginRight: 2 }}
-              component={Link}
-              to={item.toLowerCase()} 
-              smooth={true}
-              duration={1000}  
+                key={item}
+                sx={{ color: '#fff', textTransform: 'none', marginRight: 2 }}
+                component={Link} // Pour le scroll
+                to={item.toLowerCase()} // Nom de la section sur la page
+                smooth={true}
+                duration={1000}
               >
                 {item}
               </Button>
@@ -51,8 +53,8 @@ const Navbar = () => {
             variant="outlined"
             color="inherit"
             sx={{ display: { xs: 'none', md: 'block' }, borderColor: '#fff' }}
-            component={Link}
-            to="/connexion"
+            component={RouterLink} // Utilisez RouterLink pour la navigation
+            to="/LoginForm"
           >
             Connexion
           </Button>
@@ -73,11 +75,18 @@ const Navbar = () => {
               onClose={handleMenuClose}
             >
               {navItems.map((item) => (
-                <MenuItem key={item} onClick={handleMenuClose} component={Link} to={`/${item.toLowerCase()}`}>
+                <MenuItem
+                  key={item}
+                  onClick={handleMenuClose}
+                  component={Link} // Pour le scroll
+                  to={item.toLowerCase()} // Nom de la section
+                  smooth={true}
+                  duration={1000}
+                >
                   {item}
                 </MenuItem>
               ))}
-              <MenuItem onClick={handleMenuClose} component={Link} to="/connexion">
+              <MenuItem onClick={handleMenuClose} component={RouterLink} to="/LoginForm">
                 Connexion
               </MenuItem>
             </Menu>

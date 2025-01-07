@@ -14,9 +14,11 @@ import {
   IconButton,
   Alert,
 } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';  // Import de useNavigate
 import { Visibility, VisibilityOff, Email, Person, Phone } from '@mui/icons-material';
 
 const SignupForm = () => {
+  const navigate = useNavigate(); // Hook pour la navigation
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -30,6 +32,7 @@ const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [message, setMessage] = useState(''); // État pour le message
 
   const validatePassword = (password) => {
     let strength = 0;
@@ -51,7 +54,6 @@ const SignupForm = () => {
       [name]: newValue,
     }));
 
-    // Clear related errors
     setErrors((prev) => ({
       ...prev,
       [name]: '',
@@ -76,7 +78,7 @@ const SignupForm = () => {
     }
   }, [formData.password, formData.confirmPassword]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
@@ -105,11 +107,37 @@ const SignupForm = () => {
       return;
     }
 
-    console.log('Form submitted:', formData);
+    try {
+      const response = await fetch('http://localhost:5000/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage('Account successfully created!'); // Message de succès
+        setTimeout(() => {
+          navigate('/LoginForm');  // Redirection après 3 secondes
+        }, 3000);  // Délai de 3 secondes avant la redirection
+      } else {
+        setMessage(`Error: ${data.message}`); // Message d'erreur
+      }
+    } catch (error) {
+      console.error('Error during sign up:', error);
+      setMessage('Error during sign up. Please try again.');
+    }
   };
 
   return (
-    <Card sx={{ maxWidth: 500, mx: 'auto', mt: 5 }}>
+    <Card sx={{ maxWidth: 500, mx: 'auto', mt: 5, marginTop: 20 }}>
       <CardHeader
         title="Create Your Account"
         subheader="Start booking your next adventure today"
@@ -117,6 +145,13 @@ const SignupForm = () => {
       />
       <CardContent>
         <form onSubmit={handleSubmit}>
+          {/* Message d'alerte */}
+          {message && (
+            <Alert severity={message.startsWith('Error') ? 'error' : 'success'}>
+              {message}
+            </Alert>
+          )}
+
           <Grid container spacing={2}>
             {/* Full Name */}
             <Grid item xs={12}>
@@ -253,6 +288,20 @@ const SignupForm = () => {
                 Create Account
               </Button>
             </Grid>
+
+            {/* Redirection Button to Login */}
+            {message && !message.startsWith('Error') && (
+              <Grid item xs={12} mt={2}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  fullWidth
+                  onClick={() => navigate('/login')}
+                >
+                  Go to Login
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </form>
       </CardContent>
