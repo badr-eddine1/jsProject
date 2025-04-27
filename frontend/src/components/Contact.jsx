@@ -2,10 +2,10 @@ import React from 'react';
 import { Box, Typography, Grid, IconButton } from '@mui/material';
 import { Phone, Email, LocationOn, Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
 
-const FooterContact = () => {
+const Contact = () => {
   return (
     <Box
-      id="contact" // Ajoutez un id pour la navigation
+      id="contact" 
       sx={{
         backgroundColor: '#212121',
         color: 'white',
@@ -16,7 +16,7 @@ const FooterContact = () => {
       }}
     >
       <Grid container spacing={4} justifyContent="center">
-        {/* Informations de contact */}
+      
         <Grid item xs={12} sm={6} md={3}>
           <Typography variant="h6" gutterBottom>
             Informations de contact
@@ -67,4 +67,4 @@ const FooterContact = () => {
   );
 };
 
-export default FooterContact;
+export default Contact;

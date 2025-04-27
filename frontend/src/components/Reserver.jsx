@@ -1,126 +1,206 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Grid, Card, CardContent, Alert } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Typography } from '@mui/material';
+import axios from 'axios';
 
-const PaymentForm = () => {
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardName: '',
+const Reserver = ({ open, onClose, logement, handleReservationSuccess }) => {
+  const [dates, setDates] = useState({ dateArrivee: '', dateDepart: '' });
+  const [nombrePersonnes, setNombrePersonnes] = useState(1);
+  const [telephone, setTelephone] = useState('');
+  const [adresse, setAdresse] = useState('');
+  const [preferences, setPreferences] = useState({ litDouble: false, vueMer: false });
+
+  // États pour le paiement
+  const [cardDetails, setCardDetails] = useState({
     cardNumber: '',
+    cardHolderName: '',
     expiryDate: '',
-    cvv: '',
+    cvv: ''
   });
 
-  const [successMessage, setSuccessMessage] = useState(''); // État pour le message de succès
+  const [showPaymentForm, setShowPaymentForm] = useState(false); // Nouveau state pour afficher la section de paiement
 
+  // Gestion des changements dans les champs de saisie
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPaymentInfo({ ...paymentInfo, [name]: value });
+    if (name === 'dateArrivee' || name === 'dateDepart') {
+      setDates((prev) => ({ ...prev, [name]: value }));
+    } else if (name === 'cardNumber' || name === 'cardHolderName' || name === 'expiryDate' || name === 'cvv') {
+      setCardDetails((prev) => ({ ...prev, [name]: value }));
+    } else if (name === 'telephone') {
+      setTelephone(value);
+    } else if (name === 'adresse') {
+      setAdresse(value);
+    } else {
+      setNombrePersonnes(value);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSuccessMessage('Paiement réussi ! Merci pour votre réservation.'); // Affiche le message de succès
-    setPaymentInfo({
-      cardName: '',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-    });
+  const handleReserver = () => {
+    if (!dates.dateArrivee || !dates.dateDepart || !telephone || !adresse) {
+      alert("Veuillez remplir toutes les informations.");
+      return;
+    }
 
-    // Masquer le message après quelques secondes (optionnel)
-    setTimeout(() => {
-      setSuccessMessage('');
-    }, 5000);
+    // Passer à la section de paiement une fois la réservation de base confirmée
+    setShowPaymentForm(true);
+  };
+
+  const handleFinaliserReservation = async () => {
+    if (!cardDetails.cardNumber || !cardDetails.cardHolderName || !cardDetails.expiryDate || !cardDetails.cvv) {
+      alert("Veuillez compléter les informations de paiement.");
+      return;
+    }
+
+    try {
+      const reservationData = {
+        logementId: logement._id,
+        dateArrivee: dates.dateArrivee,
+        dateDepart: dates.dateDepart,
+        nombrePersonnes,
+        telephone,
+        adresse,
+        preferences,
+        paiement: {
+          cardNumber: cardDetails.cardNumber,
+          cardHolderName: cardDetails.cardHolderName,
+          expiryDate: cardDetails.expiryDate,
+          cvv: cardDetails.cvv
+        }
+      };
+
+      // Envoie des données de réservation au backend
+      await axios.post('http://localhost:5000/api/reservations', reservationData);
+      handleReservationSuccess();  // Appel de la fonction de succès
+      onClose();  // Ferme la boîte de dialogue après réservation réussie
+    } catch (error) {
+      console.error('Erreur lors de la réservation:', error);
+      alert('Erreur lors de la réservation. Veuillez réessayer.');
+    }
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 20 }}>
-      <Card sx={{ width: '100%', maxWidth: 1000, boxShadow: 3 }}>
-        <CardContent>
-          {/* Affichage du message de succès */}
-          {successMessage && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {successMessage}
-            </Alert>
-          )}
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Réserver un logement</DialogTitle>
+      <DialogContent>
+        <Typography variant="body1" gutterBottom>
+          Vous réservez le logement: {logement.titre}
+        </Typography>
+        
+        <TextField
+          label="Date d'arrivée"
+          type="date"
+          name="dateArrivee"
+          fullWidth
+          value={dates.dateArrivee}
+          onChange={handleChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          sx={{ mb: 2 }}
+        />
+        
+        <TextField
+          label="Date de départ"
+          type="date"
+          name="dateDepart"
+          fullWidth
+          value={dates.dateDepart}
+          onChange={handleChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          sx={{ mb: 2 }}
+        />
+        
+        <TextField
+          label="Nombre de personnes"
+          type="number"
+          name="nombrePersonnes"
+          fullWidth
+          value={nombrePersonnes}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+        
+        <TextField
+          label="Numéro de téléphone"
+          type="text"
+          name="telephone"
+          fullWidth
+          value={telephone}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
 
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Paiement 
-          </Typography>
-          <Typography variant="body1" color="textSecondary" align="center" gutterBottom>
-            Entrez vos informations de paiement pour compléter votre réservation.
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Nom sur la carte"
-                  name="cardName"
-                  value={paymentInfo.cardName}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Numéro de carte"
-                  name="cardNumber"
-                  value={paymentInfo.cardNumber}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                  margin="normal"
-                  type="text"
-                  inputProps={{ maxLength: 16 }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Date d'expiration"
-                  name="expiryDate"
-                  value={paymentInfo.expiryDate}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                  margin="normal"
-                  placeholder="MM/AA"
-                  type="text"
-                  inputProps={{ maxLength: 5 }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="CVV"
-                  name="cvv"
-                  value={paymentInfo.cvv}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                  margin="normal"
-                  type="password"
-                  inputProps={{ maxLength: 3 }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                >
-                  Confirmer le Paiement
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
+        <TextField
+          label="Adresse"
+          type="text"
+          name="adresse"
+          fullWidth
+          value={adresse}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+        />
+        
+        {showPaymentForm && (
+          <>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              Détails du paiement
+            </Typography>
+
+            <TextField
+              label="Numéro de carte"
+              type="text"
+              name="cardNumber"
+              fullWidth
+              value={cardDetails.cardNumber}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            
+            <TextField
+              label="Nom du titulaire"
+              type="text"
+              name="cardHolderName"
+              fullWidth
+              value={cardDetails.cardHolderName}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              label="Date d'expiration"
+              type="month"
+              name="expiryDate"
+              fullWidth
+              value={cardDetails.expiryDate}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            
+            <TextField
+              label="CVV"
+              type="text"
+              name="cvv"
+              fullWidth
+              value={cardDetails.cvv}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+          </>
+        )}
+      </DialogContent>
+      
+      <DialogActions>
+        <Button onClick={onClose} color="secondary">Annuler</Button>
+        {!showPaymentForm ? (
+          <Button onClick={handleReserver} color="primary">Passer au paiement</Button>
+        ) : (
+          <Button onClick={handleFinaliserReservation} color="primary">Finaliser la réservation</Button>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default PaymentForm;
-
+export default Reserver;

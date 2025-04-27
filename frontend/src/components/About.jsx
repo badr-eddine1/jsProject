@@ -12,15 +12,14 @@ const About = () => {
         <Typography variant="h5" color="textSecondary" paragraph align="center">
           Nous offrons une expérience inoubliable avec des chambres luxueuses, des services haut de gamme et un cadre exceptionnel pour vous détendre ou travailler.
         </Typography>
-
         <Grid container spacing={4}>
-          {/* Première section : Confort et luxe */}
+         
           <Grid item xs={12} md={6}>
             <Card sx={{ display: 'flex', flexDirection: 'column', boxShadow: 4 }}>
               <CardMedia
                 component="img"
                 height="250"
-                image="/images/deluxe-room.jpg" // Image de chambre luxe
+                image="/images/deluxe-room.jpg" 
                 alt="Chambre de luxe"
               />
               <CardContent>
@@ -35,7 +34,7 @@ const About = () => {
                 color="primary"
                  fullWidth
                   component={Link}
-                  to={'homeroom'}  // Utilisation du même nom pour l'ancre
+                  to={'homeroom'}  
                   smooth={true}
                   duration={1000}
                  
@@ -46,13 +45,13 @@ const About = () => {
             </Card>
           </Grid>
 
-          {/* Deuxième section : Services haut de gamme */}
+        
           <Grid item xs={12} md={6}>
             <Card sx={{ display: 'flex', flexDirection: 'column', boxShadow: 4 }}>
               <CardMedia
                 component="img"
                 height="250"
-                image="/images/hotel.jpg" // Image de services de l'hôtel
+                image="/images/hotel.jpg" 
                 alt="Services de l'hôtel"
               />
               <CardContent>
@@ -67,7 +66,7 @@ const About = () => {
                  color="primary"
                   fullWidth
                   component={Link}
-                  to={'services'}  // Utilisation du même nom pour l'ancre
+                  to={'services'}  
                   smooth={true}
                   duration={1000}
                   >
@@ -78,7 +77,7 @@ const About = () => {
           </Grid>
         </Grid>
 
-        {/* Section additionnelle : Pourquoi choisir notre hôtel ? */}
+    
         <Box id="services" sx={{ mt: 6, textAlign: 'center' }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
             Pourquoi choisir notre hôtel ?

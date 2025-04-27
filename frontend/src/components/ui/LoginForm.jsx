@@ -9,7 +9,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -24,7 +24,6 @@ const LoginForm = () => {
     setIsLoading(true);
     setError('');
 
-    // Affichage des données envoyées
     console.log('Sending data:', { email, password });
 
     try {
@@ -43,7 +42,7 @@ const LoginForm = () => {
 
       if (response.ok) {
         alert('Logged in successfully!');
-        navigate('/'); // Redirection vers le tableau de bord
+        navigate('/'); 
       } else {
         setError(data.message || 'Invalid credentials');
       }
@@ -60,7 +59,7 @@ const LoginForm = () => {
         <CardHeader title="Login" />
         <CardContent>
           <form onSubmit={handleSubmit}>
-            {/* Email Input */}
+
             <TextField
               label="Email"
               type="email"
@@ -75,8 +74,6 @@ const LoginForm = () => {
                 startAdornment: <Mail sx={{ marginRight: 1 }} />,
               }}
             />
-
-            {/* Password Input */}
             <TextField
               label="Password"
               type={showPassword ? 'text' : 'password'}
@@ -101,11 +98,7 @@ const LoginForm = () => {
                 ),
               }}
             />
-
-            {/* Error message */}
             {error && <Typography color="error" sx={{ marginTop: 1 }}>{error}</Typography>}
-
-            {/* Submit Button */}
             <Button
               variant="contained"
               fullWidth
@@ -115,8 +108,6 @@ const LoginForm = () => {
             >
               {isLoading ? <CircularProgress size={24} /> : 'Login'}
             </Button>
-
-            {/* Link to Sign Up page */}
             <Typography sx={{ marginTop: 2 }} align="center">
               Don't have an account? <Link to="/SignupForm">Sign Up</Link>
             </Typography>

@@ -18,7 +18,7 @@ import { Link, useNavigate } from 'react-router-dom';  // Import de useNavigate
 import { Visibility, VisibilityOff, Email, Person, Phone } from '@mui/icons-material';
 
 const SignupForm = () => {
-  const navigate = useNavigate(); // Hook pour la navigation
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -32,7 +32,7 @@ const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [message, setMessage] = useState(''); // État pour le message
+  const [message, setMessage] = useState(''); 
 
   const validatePassword = (password) => {
     let strength = 0;
@@ -123,12 +123,12 @@ const SignupForm = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setMessage('Account successfully created!'); // Message de succès
+        setMessage('Account successfully created!'); 
         setTimeout(() => {
-          navigate('/LoginForm');  // Redirection après 3 secondes
-        }, 3000);  // Délai de 3 secondes avant la redirection
+          navigate('/LoginForm'); 
+        }, 3000); 
       } else {
-        setMessage(`Error: ${data.message}`); // Message d'erreur
+        setMessage(`Error: ${data.message}`); 
       }
     } catch (error) {
       console.error('Error during sign up:', error);
@@ -145,7 +145,6 @@ const SignupForm = () => {
       />
       <CardContent>
         <form onSubmit={handleSubmit}>
-          {/* Message d'alerte */}
           {message && (
             <Alert severity={message.startsWith('Error') ? 'error' : 'success'}>
               {message}
@@ -153,7 +152,6 @@ const SignupForm = () => {
           )}
 
           <Grid container spacing={2}>
-            {/* Full Name */}
             <Grid item xs={12}>
               <TextField
                 label="Full Name"
@@ -173,7 +171,7 @@ const SignupForm = () => {
               />
             </Grid>
 
-            {/* Email */}
+  
             <Grid item xs={12}>
               <TextField
                 label="Email"
@@ -193,7 +191,7 @@ const SignupForm = () => {
               />
             </Grid>
 
-            {/* Password */}
+     
             <Grid item xs={12}>
               <TextField
                 label="Password"
@@ -215,8 +213,6 @@ const SignupForm = () => {
                 helperText={errors.password}
               />
             </Grid>
-
-            {/* Confirm Password */}
             <Grid item xs={12}>
               <TextField
                 label="Confirm Password"
@@ -239,7 +235,7 @@ const SignupForm = () => {
               />
             </Grid>
 
-            {/* Phone Number */}
+           
             <Grid item xs={12}>
               <TextField
                 label="Phone Number (Optional)"
@@ -257,7 +253,7 @@ const SignupForm = () => {
               />
             </Grid>
 
-            {/* Terms and Conditions */}
+        =
             <Grid item xs={12}>
               <FormControlLabel
                 control={

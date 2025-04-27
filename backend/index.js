@@ -1,26 +1,30 @@
+// backend/index.js
 import express from 'express';
-import connectDB from './config/db.js';
-import userRoutes from './routes/userRoute.js';  // Importer le fichier des routes utilisateur
 import cors from 'cors';
+import connectDB from './config/db.js';
+import userRoutes from './routes/userRoute.js';
+import logementRoutes from './routes/logementRoute.js';
 
 const app = express();
+const PORT = 5000;
 
-// Middleware pour le parsing des JSON
-app.use(express.json());
+
 app.use(cors());
+app.use(express.json());
 
-// Connexion à la base de données
+
 connectDB();
 
-// Utiliser les routes utilisateurs
-app.use('/api/users', userRoutes);  // Toutes les routes définies dans userRoute.js commenceront par /api/users
 
-// Route par défaut (facultatif, pour vérifier si l'application fonctionne)
+app.use('/api/users', userRoutes);
+app.use('/api/logements', logementRoutes);
+
+
 app.get('/', (req, res) => {
-  res.send('API is running');
+  res.send('🚀 API is running...');
 });
 
-// Lancer l'application sur le port 5000
-app.listen(5000, () => {
-  console.log('App is running on port 5000');
+
+app.listen(PORT, () => {
+  console.log(`✅ Serveur en marche: http://localhost:${PORT}`);
 });

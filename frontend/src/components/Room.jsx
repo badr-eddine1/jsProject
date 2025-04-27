@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Grid,Button, Card, CardMedia, CardContent } from '@mui/material';
 
 const Room = () => {
-  // Liste des chambres avec leurs détails
+  
   const rooms = [
     {
       id: 1,
@@ -92,7 +92,6 @@ const Room = () => {
         Découvrez notre gamme de chambres adaptées à tous vos besoins.
       </Typography>
 
-      {/* Affichage des chambres sous forme de cartes */}
       <Grid container spacing={4}>
         {rooms.map((room) => (
           <Grid item xs={12} sm={6} md={4} key={room.id}>
@@ -127,9 +126,7 @@ const Room = () => {
             </Card>
           </Grid>
         ))
-        
-        
-        
+
         }
       </Grid>
       
