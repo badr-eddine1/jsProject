@@ -4,10 +4,9 @@ import { Container, Grid, Typography, Alert } from '@mui/material';
 import Navbar from './Navbar';
 import LogementCard from '../components/LogementCard';
 import AddLogementDialog from '../components/AddLogementDialog';
-import Reserver from '../components/Reserver';  // Ajouter l'import du composant Reserver
+import Reserver from '../components/Reserver'; // Import du composant Reserver
 
 const Home = () => {
-  
   const [logements, setLogements] = useState([]);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,8 +23,8 @@ const Home = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
-  const [openReservation, setOpenReservation] = useState(false);  // État pour gérer l'affichage du modal de réservation
-  const [logementSelectionne, setLogementSelectionne] = useState(null);  // Logement sélectionné pour la réservation
+  const [openReservation, setOpenReservation] = useState(false);
+  const [logementSelectionne, setLogementSelectionne] = useState(null);
 
   const availableCities = ['Casablanca', 'Marrakech', 'Rabat', 'Agadir'];
 
@@ -102,13 +101,30 @@ const Home = () => {
   };
 
   const handleReservation = (logement) => {
-    setLogementSelectionne(logement);  // Sélectionner le logement
-    setOpenReservation(true);  // Ouvrir la fenêtre modale de réservation
+    setLogementSelectionne(logement);
+    setOpenReservation(true);
+  };
+
+  // Fonction pour gérer le succès de la réservation
+  const handleReservationSuccess = () => {
+    fetchLogements();
+    setMessage({ text: 'Réservation réussie !', type: 'success' });
+    setOpenReservation(false); // fermer le modal après succès
   };
 
   const logementsToDisplay = selectedCity
     ? logements.filter((logement) => logement.ville === selectedCity)
     : logements;
+
+  // Effacer le message après 3 secondes
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ text: '', type: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <>
@@ -155,14 +171,12 @@ const Home = () => {
                         cursor: 'pointer',
                         width: '100%',
                       }}
-                      onClick={() => handleReservation(logement)}  // Passer le logement au modal
+                      onClick={() => handleReservation(logement)}
                     >
                       Réserver
                     </button>
                   </Grid>
-                  <Grid item xs={6}>
-                 
-                  </Grid>
+                  <Grid item xs={6}></Grid>
                 </Grid>
               </Grid>
             ))
@@ -178,12 +192,12 @@ const Home = () => {
         handleAddLogement={handleAddLogement}
       />
 
-      {/* Affichage de la fenêtre modale de réservation si un logement est sélectionné */}
       {logementSelectionne && (
         <Reserver
           open={openReservation}
           onClose={() => setOpenReservation(false)}
           logement={logementSelectionne}
+          handleReservationSuccess={handleReservationSuccess}
         />
       )}
     </>

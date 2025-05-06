@@ -4,6 +4,7 @@ import Home from './components/Home';
 import Contact from './components/Contact';
 import LoginForm from './components/ui/LoginForm';  
 import SignupForm from './components/ui/SignupForm'; 
+import About from './components/About';
 function App() {
   return (
     <Router>
@@ -11,7 +12,9 @@ function App() {
         {/* Route pour Home + Contact */}
         <Route path="/" element={
           <>
+          
             <Home />
+            
             <Contact />
           </>
         } />
