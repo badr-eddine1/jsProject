@@ -5,17 +5,26 @@ import Contact from './components/Contact';
 import LoginForm from './components/ui/LoginForm';  
 import SignupForm from './components/ui/SignupForm'; 
 import About from './components/About';
+import Navbar from './components/Navbar';
 function App() {
   return (
     <Router>
       <Routes>
         {/* Route pour Home + Contact */}
-        <Route path="/" element={
+        <Route path="/home" element={
           <>
           
             <Home />
             
             <Contact />
+          </>
+        } />
+        <Route path="/" element={
+          <>
+            
+            <About />
+            
+           
           </>
         } />
 
