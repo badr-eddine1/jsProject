@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import Logement from './logement'; // Importer le modèle Logement
-import User from './users'; // Importer le modèle User
+import Logement from './logement.js'; // Importer le modèle Logement
+import User from './users.js'; // Importer le modèle User
 
 const reservationSchema = new mongoose.Schema(
   {

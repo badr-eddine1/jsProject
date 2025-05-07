@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Grid, Typography, Alert } from '@mui/material';
-import Navbar from './Navbar';
+import Navbar from './navbar';
 import LogementCard from '../components/LogementCard';
 import AddLogementDialog from '../components/AddLogementDialog';
 import Reserver from '../components/Reserver'; // Import du composant Reserver
+import ChatBot from './ChatBot'; // Add this import
 
 const Home = () => {
   const [logements, setLogements] = useState([]);
@@ -200,6 +201,8 @@ const Home = () => {
           handleReservationSuccess={handleReservationSuccess}
         />
       )}
+
+      <ChatBot />
     </>
   );
 };

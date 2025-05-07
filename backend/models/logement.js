@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+
+
 // Définir le schéma du logement
 const logementSchema = mongoose.Schema({
   titre: {
@@ -42,7 +44,7 @@ const logementSchema = mongoose.Schema({
   timestamps: true, // Ajoute les champs createdAt et updatedAt
 });
 
-// Créer et exporter le modèle
-const Logement = mongoose.model('Logement', logementSchema);
+// Utiliser le modèle existant s'il existe déjà, sinon le créer
+const Logement = mongoose.models.Logement || mongoose.model('Logement', logementSchema);
 
 export default Logement;
