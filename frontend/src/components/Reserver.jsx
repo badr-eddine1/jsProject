@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Alert, Typography, Paper } from '@mui/material';
+import axios from 'axios';
 
 const Reserver = ({ open, onClose, logement }) => {
   const [formData, setFormData] = useState({
     logementId: logement._id,
-    userId: '6638762e419d8f6cf58c33d0', 
+    userId: '6638762e419d8f6cf58c33d0', // Exemple d'ID utilisateur, à remplacer par l'utilisateur authentifié
     dateArrivee: '',
     dateDepart: '',
     nombrePersonnes: 1,
     telephone: '',
     adresse: '',
     preferences: '',
-    montantTotal: logement.prixParNuit || 0
+    montantTotal: logement.prixParNuit || 0,
   });
 
   const [error, setError] = useState('');
@@ -31,10 +32,19 @@ const Reserver = ({ open, onClose, logement }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Simuler la réservation réussie
-    setReservationSuccess(true);
-    setShowInvoice(true);
+  const handleSubmit = async () => {
+    try {
+      // Envoi des données de réservation au backend
+      const response = await axios.post('http://localhost:5000/api/reservations', formData);
+
+      if (response.status === 201) {
+        setReservationSuccess(true);
+        setShowInvoice(true);
+      }
+    } catch (err) {
+      setError('Erreur lors de la réservation');
+      console.error(err);
+    }
   };
 
   const handlePaymentSubmit = () => {

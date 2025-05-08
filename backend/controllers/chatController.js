@@ -1,8 +1,9 @@
+end
 const dialogflow = require('@google-cloud/dialogflow');
+const { v4: uuidv4 } = require('uuid');
 
 // Replace these with your actual Dialogflow project details
 const projectId = 'reservation-chatbot-459113';
-const sessionId = 'unique-session-id';
 const languageCode = 'fr';
 
 const sessionClient = new dialogflow.SessionsClient({
@@ -12,10 +13,14 @@ const sessionClient = new dialogflow.SessionsClient({
 const chatController = {
   async processMessage(req, res) {
     try {
-      const { message } = req.body;
+      const { message, sessionId } = req.body;
+      console.log('Received message:', message);
       
+      // Use provided sessionId or generate a new one if missing
+      const effectiveSessionId = sessionId || uuidv4();
+
       // Create a session path
-      const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
+      const sessionPath = sessionClient.projectAgentSessionPath(projectId, effectiveSessionId);
 
       // The text query request
       const request = {
@@ -31,6 +36,7 @@ const chatController = {
       // Send request and log result
       const responses = await sessionClient.detectIntent(request);
       const result = responses[0].queryResult;
+      console.log('Dialogflow fulfillmentText:', result.fulfillmentText);
 
       res.json({
         response: result.fulfillmentText,
@@ -43,4 +49,4 @@ const chatController = {
   },
 };
 
-module.exports = chatController; 
+module.exports = chatController;

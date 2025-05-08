@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Grid, Typography, Alert } from '@mui/material';
+import {
+  Container,
+  Grid,
+  Typography,
+  Alert,
+  Button,
+  Box
+} from '@mui/material';
 import Navbar from './navbar';
 import LogementCard from '../components/LogementCard';
 import AddLogementDialog from '../components/AddLogementDialog';
 import Reserver from '../components/Reserver'; // Import du composant Reserver
-import ChatBot from './ChatBot'; // Add this import
-
 const Home = () => {
   const [logements, setLogements] = useState([]);
   const [open, setOpen] = useState(false);
@@ -33,9 +38,11 @@ const Home = () => {
     fetchLogements();
   }, []);
 
+  // Fonction pour récupérer les logements depuis l'API
   const fetchLogements = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/logements');
+      console.log(res.data);  // Vérifie si les données sont récupérées correctement
       setLogements(res.data);
     } catch (err) {
       console.error('Erreur:', err);
@@ -43,6 +50,7 @@ const Home = () => {
     }
   };
 
+  // Gestion des changements dans les champs du formulaire
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -50,6 +58,7 @@ const Home = () => {
     }));
   };
 
+  // Fonction pour ajouter un logement
   const handleAddLogement = async () => {
     try {
       await axios.post('http://localhost:5000/api/logements', formData);
@@ -73,6 +82,7 @@ const Home = () => {
     }
   };
 
+  // Fonction pour supprimer un logement
   const handleDeleteLogement = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/logements/${id}`);
@@ -83,41 +93,25 @@ const Home = () => {
     }
   };
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleCitySelect = (city) => {
-    setSelectedCity(city);
-    handleClose();
-  };
-
-  const handleLogout = () => {
-    console.log("Déconnexion...");
-    // Rediriger vers la page login ici
-  };
-
+  // Fonction pour ouvrir le modal de réservation
   const handleReservation = (logement) => {
     setLogementSelectionne(logement);
     setOpenReservation(true);
   };
 
-  // Fonction pour gérer le succès de la réservation
+  // Fonction de succès de la réservation
   const handleReservationSuccess = () => {
     fetchLogements();
     setMessage({ text: 'Réservation réussie !', type: 'success' });
-    setOpenReservation(false); // fermer le modal après succès
+    setOpenReservation(false); // Fermer la fenêtre de réservation
   };
 
+  // Filtrer les logements selon la ville sélectionnée
   const logementsToDisplay = selectedCity
     ? logements.filter((logement) => logement.ville === selectedCity)
     : logements;
 
-  // Effacer le message après 3 secondes
+  // Effacer le message d'erreur après 3 secondes
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => {
@@ -130,19 +124,32 @@ const Home = () => {
   return (
     <>
       {message.text && (
-        <Alert severity={message.type} sx={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', width: '80%' }}>
+        <Alert
+          severity={message.type}
+          sx={{
+            position: 'fixed',
+            top: 16,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '80%',
+            zIndex: 1200,
+          }}
+        >
           {message.text}
         </Alert>
       )}
 
       <Navbar
-        handleClick={handleClick}
+        handleClick={(e) => setAnchorEl(e.currentTarget)}
         anchorEl={anchorEl}
-        handleClose={handleClose}
+        handleClose={() => setAnchorEl(null)}
         availableCities={availableCities}
-        handleCitySelect={handleCitySelect}
+        handleCitySelect={(city) => {
+          setSelectedCity(city);
+          setAnchorEl(null);
+        }}
         selectedCity={selectedCity}
-        handleLogout={handleLogout}
+        handleLogout={() => console.log("Déconnexion...")}
         setOpen={setOpen}
       />
 
@@ -160,49 +167,39 @@ const Home = () => {
             logementsToDisplay.map((logement) => (
               <Grid item key={logement._id} xs={12} sm={6} md={4}>
                 <LogementCard logement={logement} handleDeleteLogement={handleDeleteLogement} />
-                <Grid container spacing={1} sx={{ mt: 1 }}>
-                  <Grid item xs={6}>
-                    <button
-                      style={{
-                        backgroundColor: '#1976d2',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        width: '100%',
-                      }}
-                      onClick={() => handleReservation(logement)}
-                    >
-                      Réserver
-                    </button>
-                  </Grid>
-                  <Grid item xs={6}></Grid>
-                </Grid>
+                <Box sx={{ mt: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleReservation(logement)}
+                  >
+                    Réserver
+                  </Button>
+                </Box>
               </Grid>
             ))
           )}
         </Grid>
       </Container>
+      <ChatBot />
 
       <AddLogementDialog
         open={open}
         setOpen={setOpen}
         formData={formData}
-        handleChange={handleChange}
+        setFormData={setFormData}
         handleAddLogement={handleAddLogement}
+        handleChange={handleChange}
       />
 
-      {logementSelectionne && (
+      {openReservation && logementSelectionne && (
         <Reserver
-          open={openReservation}
-          onClose={() => setOpenReservation(false)}
           logement={logementSelectionne}
-          handleReservationSuccess={handleReservationSuccess}
+          open={openReservation}
+          setOpen={setOpenReservation}
+          onSuccess={handleReservationSuccess}
         />
       )}
-
-      <ChatBot />
     </>
   );
 };
