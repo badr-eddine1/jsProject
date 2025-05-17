@@ -22,12 +22,16 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user' // Par défaut un utilisateur classique
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
-
 
 const User = mongoose.model('User', userSchema);
 

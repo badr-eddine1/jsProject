@@ -5,7 +5,12 @@ import Contact from './components/Contact';
 import LoginForm from './components/ui/LoginForm';  
 import SignupForm from './components/ui/SignupForm'; 
 import About from './components/About';
-import Navbar from './components/navbar';
+import Profile from './components/Profile';
+import MesLogements from './components/MesLogement';
+import AdminDashboard from './components/AdminDashboard';
+import AddLogementDialog from './components/AddLogementDialog';
+
+
 function App() {
   return (
     <Router>
@@ -31,6 +36,10 @@ function App() {
         {/* Route pour Login */}
         <Route path="/loginForm" element={<LoginForm />} />
         <Route path="/SignupForm" element={<SignupForm />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/mes-logements" element={<MesLogements />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/ajouter-logement" element={< AddLogementDialog/>} />
       </Routes>
     </Router>
   );

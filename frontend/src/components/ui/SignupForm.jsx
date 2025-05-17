@@ -13,11 +13,27 @@ import {
   InputAdornment,
   IconButton,
   Alert,
+  LinearProgress,
+  Link,
+  Paper,
+  useTheme
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';  // Import de useNavigate
-import { Visibility, VisibilityOff, Email, Person, Phone } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Visibility, 
+  VisibilityOff, 
+  Email, 
+  Person, 
+  Phone,
+  ArrowForward,
+  CheckCircle,
+  Error
+} from '@mui/icons-material';
+import * as yup from 'yup';
+import { motion } from 'framer-motion';
 
 const SignupForm = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -31,83 +47,100 @@ const SignupForm = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [message, setMessage] = useState(''); 
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    message: '',
+    color: 'error'
+  });
+  const [message, setMessage] = useState({ text: '', severity: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validatePassword = (password) => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return strength;
+  // Schéma de validation avec yup
+  const validationSchema = yup.object().shape({
+    fullName: yup.string()
+      .required('Full name is required')
+      .min(3, 'Name must be at least 3 characters'),
+    email: yup.string()
+      .email('Please enter a valid email')
+      .required('Email is required'),
+    password: yup.string()
+      .required('Password is required')
+      .min(8, 'Password must be at least 8 characters'),
+    confirmPassword: yup.string()
+      .oneOf([yup.ref('password'), null], 'Passwords must match')
+      .required('Please confirm your password'),
+    agreeToTerms: yup.boolean()
+      .oneOf([true], 'You must accept the terms and conditions')
+  });
+
+  // Évalue la force du mot de passe
+  const evaluatePasswordStrength = (password) => {
+    let score = 0;
+    const messages = [];
+    const colors = ['error', 'warning', 'info', 'success'];
+    
+    if (password.length >= 8) score++;
+    else messages.push('At least 8 characters');
+    
+    if (/[A-Z]/.test(password)) score++;
+    else messages.push('At least one uppercase letter');
+    
+    if (/[0-9]/.test(password)) score++;
+    else messages.push('At least one number');
+    
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    else messages.push('At least one special character');
+    
+    return {
+      score,
+      message: messages.length > 0 ? `Missing: ${messages.join(', ')}` : 'Strong password!',
+      color: colors[score] || 'error'
+    };
   };
-
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
 
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: newValue,
     }));
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: '',
-    }));
+    // Effacer les erreurs quand l'utilisateur modifie le champ
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
 
+    // Évaluer la force du mot de passe
     if (name === 'password') {
-      setPasswordStrength(validatePassword(value));
+      setPasswordStrength(evaluatePasswordStrength(value));
     }
   };
 
-  useEffect(() => {
-    if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: 'Passwords do not match',
-      }));
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: '',
-      }));
+  const validateField = async (field, value) => {
+    try {
+      await yup.reach(validationSchema, field).validate(value);
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    } catch (err) {
+      setErrors(prev => ({ ...prev, [field]: err.message }));
     }
-  }, [formData.password, formData.confirmPassword]);
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    validateField(name, value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newErrors = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
-    }
-
-    if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms and conditions';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    setIsSubmitting(true);
+    setMessage({ text: '', severity: '' });
 
     try {
+      // Validation complète
+      await validationSchema.validate(formData, { abortEarly: false });
+
       const response = await fetch('http://localhost:5000/api/users/signup', {
         method: 'POST',
         headers: {
@@ -122,186 +155,290 @@ const SignupForm = () => {
       });
 
       const data = await response.json();
+
       if (response.ok) {
-        setMessage('Account successfully created!'); 
-        setTimeout(() => {
-          navigate('/LoginForm'); 
-        }, 3000); 
+        setMessage({ 
+          text: 'Account successfully created! Redirecting to login...', 
+          severity: 'success' 
+        });
+        setTimeout(() => navigate('/login'), 2000);
       } else {
-        setMessage(`Error: ${data.message}`); 
+        throw new Error(data.message || 'Registration failed');
       }
     } catch (error) {
-      console.error('Error during sign up:', error);
-      setMessage('Error during sign up. Please try again.');
+      if (error.name === 'ValidationError') {
+        const validationErrors = {};
+        error.inner.forEach(err => {
+          validationErrors[err.path] = err.message;
+        });
+        setErrors(validationErrors);
+      } else {
+        setMessage({ 
+          text: error.message || 'Error during sign up. Please try again.', 
+          severity: 'error' 
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Card sx={{ maxWidth: 500, mx: 'auto', mt: 5, marginTop: 20 }}>
-      <CardHeader
-        title="Create Your Account"
-        subheader="Start booking your next adventure today"
-        sx={{ textAlign: 'center' }}
-      />
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          {message && (
-            <Alert severity={message.startsWith('Error') ? 'error' : 'success'}>
-              {message}
-            </Alert>
-          )}
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: theme.palette.mode === 'light' 
+          ? 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' 
+          : theme.palette.background.default,
+        p: 2
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card 
+          sx={{ 
+            maxWidth: 500, 
+            width: '100%',
+            boxShadow: theme.shadows[10],
+            borderRadius: 4,
+            overflow: 'hidden'
+          }}
+        >
+          <Box
+            sx={{
+              background: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              p: 3,
+              textAlign: 'center'
+            }}
+          >
+            <Typography variant="h4" component="h1" fontWeight="bold">
+              Create Your Account
+            </Typography>
+            <Typography variant="subtitle1">
+              Start booking your next adventure today
+            </Typography>
+          </Box>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Full Name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Person />
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!errors.fullName}
-                helperText={errors.fullName}
-              />
-            </Grid>
-
-  
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email />
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!errors.email}
-                helperText={errors.email}
-              />
-            </Grid>
-
-     
-            <Grid item xs={12}>
-              <TextField
-                label="Password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={handleChange}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!errors.password}
-                helperText={errors.password}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Confirm Password"
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword}
-              />
-            </Grid>
-
-           
-            <Grid item xs={12}>
-              <TextField
-                label="Phone Number (Optional)"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Phone />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-
-        =
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="agreeToTerms"
-                    checked={formData.agreeToTerms}
-                    onChange={handleChange}
-                  />
-                }
-                label="I agree to the terms and conditions"
-              />
-              {errors.agreeToTerms && (
-                <Typography variant="body2" color="error">
-                  {errors.agreeToTerms}
-                </Typography>
-              )}
-            </Grid>
-
-            {/* Submit Button */}
-            <Grid item xs={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                disabled={!formData.agreeToTerms}
+          <CardContent sx={{ p: 4 }}>
+            {message.text && (
+              <Alert 
+                severity={message.severity}
+                icon={message.severity === 'success' ? <CheckCircle /> : <Error />}
+                sx={{ mb: 3 }}
               >
-                Create Account
-              </Button>
-            </Grid>
-
-            {/* Redirection Button to Login */}
-            {message && !message.startsWith('Error') && (
-              <Grid item xs={12} mt={2}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  fullWidth
-                  onClick={() => navigate('/login')}
-                >
-                  Go to Login
-                </Button>
-              </Grid>
+                {message.text}
+              </Alert>
             )}
-          </Grid>
-        </form>
-      </CardContent>
-    </Card>
+
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Full Name"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Person color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    error={!!errors.fullName}
+                    helperText={errors.fullName}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Email color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton 
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    error={!!errors.password}
+                    helperText={errors.password}
+                  />
+                  <Box sx={{ mt: 1 }}>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={passwordStrength.score * 25} 
+                      color={passwordStrength.color}
+                      sx={{ height: 4, borderRadius: 2 }}
+                    />
+                    <Typography 
+                      variant="caption" 
+                      color={`${passwordStrength.color}.main`}
+                      sx={{ mt: 0.5, display: 'block' }}
+                    >
+                      {passwordStrength.message}
+                    </Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton 
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Phone Number (Optional)"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Phone color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="agreeToTerms"
+                        checked={formData.agreeToTerms}
+                        onChange={handleChange}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        I agree to the{' '}
+                        <Link href="#" color="primary">
+                          Terms and Conditions
+                        </Link>
+                      </Typography>
+                    }
+                  />
+                  {errors.agreeToTerms && (
+                    <Typography variant="caption" color="error" sx={{ display: 'block', mt: -1 }}>
+                      {errors.agreeToTerms}
+                    </Typography>
+                  )}
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    size="large"
+                    disabled={isSubmitting}
+                    endIcon={<ArrowForward />}
+                    sx={{
+                      py: 1.5,
+                      fontWeight: 'bold',
+                      borderRadius: 2,
+                      boxShadow: 'none',
+                      '&:hover': {
+                        boxShadow: theme.shadows[4],
+                        transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                  </Button>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                    Already have an account?{' '}
+                    <Link 
+                      href="#" 
+                      color="primary" 
+                      fontWeight="bold"
+                      onClick={() => navigate('/loginForm')}
+                    >
+                      Sign In
+                    </Link>
+                  </Typography>
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </Box>
   );
 };
 
