@@ -1,5 +1,6 @@
 import express from 'express';
 import Logement from '../models/logement.js';
+import Reservation from '../models/Reservation.js';  // Import pour vérifier réservations
 import verifyToken from '../middleware/authmiddlware.js'; // adapte selon ton middleware
 
 const router = express.Router();
@@ -109,6 +110,50 @@ router.delete('/:id', verifyToken, async (req, res) => {
       message: "Erreur lors de la suppression du logement",
       error: err.message,
     });
+  }
+});
+
+// 🔎 Recherche logements disponibles selon critères et dates
+router.post('/recherche', async (req, res) => {
+  try {
+    const { ville, pays, dateArrivee, dateDepart, prixMax } = req.body;
+
+    if (!dateArrivee || !dateDepart) {
+      return res.status(400).json({ message: 'Veuillez fournir les dates d’arrivée et de départ.' });
+    }
+
+    // Construire filtre destination et prix max
+    const filtre = {};
+    if (ville) filtre.ville = ville;
+    if (pays) filtre.pays = pays;
+    if (prixMax) filtre.prixParNuit = { $lte: prixMax };
+
+    // Trouver logements selon critères
+    const logements = await Logement.find(filtre);
+
+    // Filtrer logements indisponibles sur dates
+    const logementsDisponibles = [];
+
+    for (const logement of logements) {
+      const chevauchement = await Reservation.findOne({
+        logementId: logement._id,
+        $or: [
+          {
+            dateArrivee: { $lt: new Date(dateDepart) },
+            dateDepart: { $gt: new Date(dateArrivee) },
+          },
+        ],
+      });
+
+      if (!chevauchement) {
+        logementsDisponibles.push(logement);
+      }
+    }
+
+    res.status(200).json(logementsDisponibles);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur lors de la recherche', error: err.message });
   }
 });
 

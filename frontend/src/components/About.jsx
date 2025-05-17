@@ -289,11 +289,11 @@ const Footer = () => {
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ mb: 2 }}>
-              123 Avenue des Champs-Élysées<br />
-              75008 Paris, France
+              Marrakech<br />
+              75008 Marrakech, Maroc
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }}>
-              Tél: +33 1 23 45 67 89<br />
+              Tél: 06 23 45 67 89<br />
               Email: contact@bibmhotel.com
             </Typography>
           </Grid>
@@ -334,9 +334,6 @@ const Footer = () => {
 
         <Divider sx={{ my: 4, backgroundColor: 'rgba(255,255,255,0.1)' }} />
 
-        <Typography variant="body2" align="center">
-          © {new Date().getFullYear()} BIBM Hôtel. Tous droits réservés.
-        </Typography>
       </Container>
     </Box>
   );

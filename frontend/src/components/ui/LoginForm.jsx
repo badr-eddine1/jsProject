@@ -284,7 +284,7 @@ const LoginForm = () => {
                 Don't have an account?{' '}
                 <MuiLink 
                   component={Link} 
-                  to="/signup" 
+                  to="/signupForm" 
                   color="primary"
                   fontWeight="bold"
                 >

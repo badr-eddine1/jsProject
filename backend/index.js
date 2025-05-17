@@ -10,6 +10,10 @@ import reservationRoutes from './routes/reservationRoute.js';
 
  import paymentRoutes from './routes/payments.js';
 
+ import faqRoutes from './routes/faqRoute.js';
+ import chatbotRoutes from './routes/chatbot.js';
+
+ 
 
  
 
@@ -26,6 +30,8 @@ app.use(express.json());
 connectDB();
 
 // Définir les routes principales
+app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/faq', faqRoutes);
 app.use('/api/admin', adminRoute);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/users', userRoutes);
