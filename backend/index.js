@@ -6,16 +6,12 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoute.js';
 import logementRoutes from './routes/logementRoute.js';
 import reservationRoutes from './routes/reservationRoute.js';
- import adminRoute from './routes/adminRoute.js'
+import adminRoute from './routes/adminRoute.js'
 
- import paymentRoutes from './routes/payments.js';
+import paymentRoutes from './routes/payments.js';
 
- import faqRoutes from './routes/faqRoute.js';
- import chatbotRoutes from './routes/chatbot.js';
-
- 
-
- 
+import faqRoutes from './routes/faqRoute.js';
+import chatbotRoutes from './routes/chatbot.js';
 
 dotenv.config();
 

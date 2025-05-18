@@ -37,7 +37,15 @@ import { useTheme } from '@mui/material/styles';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+// Initialize Stripe with error handling
+const stripePromise = (() => {
+  const stripePublicKey = process.env.REACT_APP_STRIPE_PUBLIC_KEY;
+  if (!stripePublicKey) {
+    console.error('Stripe public key is missing. Please check your environment variables.');
+    return null;
+  }
+  return loadStripe(stripePublicKey);
+})();
 
 // Composant formulaire de paiement Stripe amélioré
 const CheckoutForm = ({ clientSecret, onSuccess, onError, amount }) => {
@@ -448,14 +456,20 @@ const Reserver = ({ open, onClose, logement, onSuccess }) => {
         )}
 
         {activeStep === 1 && clientSecret && (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm
-              clientSecret={clientSecret}
-              onSuccess={handlePaymentSuccess}
-              onError={(err) => setError(err.message)}
-              amount={formData.montantTotal}
-            />
-          </Elements>
+          stripePromise ? (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutForm
+                clientSecret={clientSecret}
+                onSuccess={handlePaymentSuccess}
+                onError={(err) => setError(err.message)}
+                amount={formData.montantTotal}
+              />
+            </Elements>
+          ) : (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              Le système de paiement n'est pas disponible pour le moment. Veuillez réessayer plus tard.
+            </Alert>
+          )
         )}
       </DialogContent>
 

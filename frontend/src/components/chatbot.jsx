@@ -19,12 +19,7 @@ import {
   InputLabel,
   useMediaQuery,
   Fab,
-  Badge,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Avatar,
+
   Paper as MuiPaper,
 } from '@mui/material';
 import {
@@ -32,16 +27,11 @@ import {
   FilterList,
   Add,
   Close,
-  Euro,
-  ArrowUpward,
-  ArrowDownward,
-  Event,
-  Star,
-  Tune,
   Chat as ChatIcon,
   Send as SendIcon,
 } from '@mui/icons-material';
 import { useTheme, styled } from '@mui/material/styles';
+import { v4 as uuidv4 } from 'uuid';
 
 import Navbar from './navbar';
 import LogementCard from '../components/LogementCard';
@@ -162,8 +152,10 @@ const Home = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { text: 'Bonjour ! Comment puis-je vous aider aujourd’hui ?', isUser: false },
+    { text: "Bonjour ! Comment puis-je vous aider aujourd'hui ?", isUser: false }
   ]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState('');
 
   const availableCities = ['Tous', 'Casablanca', 'Marrakech', 'Rabat', 'Agadir'];
   const ratings = [0, 1, 2, 3, 4, 5];
@@ -205,7 +197,7 @@ const Home = () => {
 
   const handleReservationSuccess = () => {
     fetchLogements();
-    setMessage({ text: 'Réservation réussie !', type: 'success' });
+    setMessage({ text: 'Réservation réussie !', type: 'success' });
     setOpenReservation(false);
   };
 
@@ -267,21 +259,35 @@ const Home = () => {
   }, [logements, filterByCity, filterBySearch, filterByPrice, filterByRating, sortLogements]);
 
   // Gestion chatbot
-  const sendChatMessage = (e) => {
+  const sendChatMessage = async (e) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || chatLoading) return;
+
     const userMsg = { text: chatInput.trim(), isUser: true };
     setChatMessages((prev) => [...prev, userMsg]);
     setChatInput('');
+    setChatLoading(true);
+    setChatError('');
 
-    // Simuler réponse bot après délai
-    setTimeout(() => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/chatbot/ask', {
+        message: userMsg.text
+      });
+
       const botMsg = {
-        text: `Vous avez dit : "${userMsg.text}". Je suis un chatbot de démo.`,
+        text: res.data.reply || "Désolé, je n'ai pas compris. Pouvez-vous reformuler ?",
         isUser: false,
       };
       setChatMessages((prev) => [...prev, botMsg]);
-    }, 1500);
+    } catch (err) {
+      setChatError("Erreur lors de la communication avec l'assistant. Veuillez réessayer.");
+      setChatMessages((prev) => [
+        ...prev,
+        { text: "Erreur lors de la communication avec l'assistant. Veuillez réessayer.", isUser: false },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   return (
@@ -464,6 +470,13 @@ const Home = () => {
             {chatMessages.map((msg, idx) => (
               <ChatMessage key={idx} message={msg} isUser={msg.isUser} />
             ))}
+            {chatLoading && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
+                <Box sx={{ bgcolor: 'grey.300', color: 'text.primary', p: 1.5, borderRadius: 2, fontSize: 14 }}>
+                  <CircularProgress size={18} sx={{ mr: 1 }} /> Assistant rédige une réponse...
+                </Box>
+              </Box>
+            )}
           </ChatMessages>
 
           <ChatInputArea onSubmit={sendChatMessage}>

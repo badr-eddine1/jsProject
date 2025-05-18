@@ -9,6 +9,7 @@ import Profile from './components/Profile';
 import MesLogements from './components/MesLogement';
 import AdminDashboard from './components/AdminDashboard';
 import AddLogementDialog from './components/AddLogementDialog';
+import Chatbot from './components/chatbot';
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/ajouter-logement" element={< AddLogementDialog/>} />
       </Routes>
+      <Chatbot />
     </Router>
   );
 }
